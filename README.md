@@ -1,42 +1,44 @@
-![](../../workflows/gds/badge.svg) ![](../../workflows/docs/badge.svg) ![](../../workflows/test/badge.svg) ![](../../workflows/fpga/badge.svg)
+# HATSUNE MIKU ON FPGA TINYTAPEOUT
 
-# Tiny Tapeout Verilog Project Template
+## How it works
 
-- [Read the documentation for project](docs/info.md)
+This chip creates a live picture on a computer monitor without needing a computer brain, memory card, or software. Everything you see is drawn instantly by the physical wiring inside the chip.
 
-## What is Tiny Tapeout?
+* **Tracking the Screen:** The chip counts every single dot and line from top to bottom, 60 times every second, to keep the picture perfectly in place.
+* **Drawing the Picture:** As the screen draws each dot, the chip chooses the color based on where the dot is. It uses Hatsune Miku's signature colors—bright teal, black, and pink accents—to form the image.
+* **Screen Timing:** The chip tells the monitor when to jump to the next line and when to restart at the top of the screen so the picture stays steady and clear.
+* **Color Output:** It sends the final colors directly to the display board as red, green, and blue signals.
 
-Tiny Tapeout is an educational project that aims to make it easier and cheaper than ever to get your digital and analog designs manufactured on a real chip.
+## How to test
 
-To learn more and get started, visit https://tinytapeout.com.
+### 1. Test in a Web Browser
 
-## Set up your Verilog project
+You can see what the chip draws right on your computer without any physical parts:
 
-1. Add your Verilog files to the `src` folder.
-2. Edit the [info.yaml](info.yaml) and update information about your project, paying special attention to the `source_files` and `top_module` properties. If you are upgrading an existing Tiny Tapeout project, check out our [online info.yaml migration tool](https://tinytapeout.github.io/tt-yaml-upgrade-tool/).
-3. Edit [docs/info.md](docs/info.md) and add a description of your project.
-4. Adapt the testbench to your design. See [test/README.md](test/README.md) for more information.
+* Open `[https://vga-playground.com/?repo=https://github.com/](https://vga-playground.com/?repo=https://github.com/)<your-username>/<your-repo-name>`
+* The page runs the chip design in your browser and shows the live picture immediately.
 
-The GitHub action will automatically build the ASIC files using [LibreLane](https://www.zerotoasiccourse.com/terminology/librelane/).
+### 2. Run the Automatic Tests
 
-## Enable GitHub actions to build the results page
+Run the included test script on your computer to make sure the signals turn on and off properly:
 
-- [Enabling GitHub Pages](https://tinytapeout.com/faq/#my-github-action-is-failing-on-the-pages-part)
+```bash
+cd test
+make
 
-## Resources
+```
 
-- [FAQ](https://tinytapeout.com/faq/)
-- [Digital design lessons](https://tinytapeout.com/digital_design/)
-- [Learn how semiconductors work](https://tinytapeout.com/siliwiz/)
-- [Join the community](https://tinytapeout.com/discord)
-- [Build your design locally](https://www.tinytapeout.com/guides/local-hardening/)
+### 3. Test on Real Hardware
 
-## What next?
+1. Plug the TinyVGA display adapter board into the chip board output pins.
+2. Connect a monitor cable from the adapter board to a standard monitor.
+3. Turn on the chip's speed clock.
+4. Press and release the reset button to start the picture from the top left corner.
+5. Flip the selector switches to turn this project on, and the image will appear on your screen.
 
-- [Submit your design to the next shuttle](https://app.tinytapeout.com/).
-- Edit [this README](README.md) and explain your design, how it works, and how to test it.
-- Share your project on your social network of choice:
-  - LinkedIn [#tinytapeout](https://www.linkedin.com/search/results/content/?keywords=%23tinytapeout) [@TinyTapeout](https://www.linkedin.com/company/100708654/)
-  - Mastodon [#tinytapeout](https://chaos.social/tags/tinytapeout) [@matthewvenn](https://chaos.social/@matthewvenn)
-  - X (formerly Twitter) [#tinytapeout](https://twitter.com/hashtag/tinytapeout) [@tinytapeout](https://twitter.com/tinytapeout)
-  - Bluesky [@tinytapeout.com](https://bsky.app/profile/tinytapeout.com)
+## External hardware
+
+* **TinyVGA adapter board:** Plugs into the chip pins so a monitor cable can connect to it.
+* **Standard monitor:** Any regular computer screen with a blue VGA plug.
+* **VGA monitor cable:** Connects the adapter board to the screen.
+* **Clock source:** Provides the steady pulse that sets the chip's drawing speed.
