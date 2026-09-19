@@ -1,11 +1,13 @@
 # Tiny Tapeout project information
 project:
-  title:        ""      # Project title
-  author:       ""      # Your name
-  discord:      ""      # Your discord username, for communication and automatically assigning you a Tapeout role (optional)
-  description:  ""      # One line description of what your project does
-  language:     "Verilog" # other examples include SystemVerilog, Amaranth, VHDL, etc
-  clock_hz:     0       # Clock frequency in Hz (or 0 if not applicable)
+  title:        "My IHP VGA Demo"
+  author:       "Eli"
+  description:  "VGA pattern generator targeting TinyVGA PMOD"
+  language:     "Verilog"
+  top_module:   "tt_um_vga_example"      # Must match module name in project.v
+  source_files:
+    - "project.v"
+  clock_hz:     25175000                 # Standard 25.175 MHz pixel clock
 
   # How many tiles your design occupies? A single tile is about 167x108 uM.
   tiles: "1x1"          # Valid values: 1x1, 1x2, 2x2, 3x2, 4x2, 6x2 or 8x2
