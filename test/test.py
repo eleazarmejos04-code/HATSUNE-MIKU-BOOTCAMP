@@ -8,33 +8,46 @@ from cocotb.triggers import ClockCycles
 
 @cocotb.test()
 async def test_project(dut):
-    dut._log.info("Start")
+    dut._log.info("Start VGA simulation")
 
-    # Set the clock period to 10 us (100 KHz)
-    clock = Clock(dut.clk, 10, unit="us")
+    # Set clock to ~25.175 MHz (period ~39.72 ns; 40 ns is standard for cocotb sim)
+    clock = Clock(dut.clk, 40, unit="ns")
     cocotb.start_soon(clock.start())
 
-    # Reset
-    dut._log.info("Reset")
+    # Initialize pins & apply reset
+    dut._log.info("Resetting design")
     dut.ena.value = 1
     dut.ui_in.value = 0
     dut.uio_in.value = 0
     dut.rst_n.value = 0
+
     await ClockCycles(dut.clk, 10)
     dut.rst_n.value = 1
+    await ClockCycles(dut.clk, 2)
 
-    dut._log.info("Test project behavior")
+    dut._log.info("Testing initial output state after reset")
 
-    # Set the input values you want to test
-    dut.ui_in.value = 20
-    dut.uio_in.value = 30
+    # Decode standard TinyVGA PMOD bits:
+    # uo_out[7] = hsync, uo_out[3] = vsync
+    # uo_out[0, 4] = red, uo_out[1, 5] = green, uo_out[2, 6] = blue
+    val = int(dut.uo_out.value)
+    hsync = (val >> 7) & 1
+    vsync = (val >> 3) & 1
 
-    # Wait for one clock cycle to see the output values
-    await ClockCycles(dut.clk, 1)
+    # In active visible display area (x=0, y=0), standard 640x480 sync lines are high (active low)
+    assert hsync == 1, f"Expected HSync=1 during visible display, got {hsync}"
+    assert vsync == 1, f"Expected VSync=1 during visible display, got {vsync}"
 
-    # The following assersion is just an example of how to check the output values.
-    # Change it to match the actual expected output of your module:
-    assert dut.uo_out.value == 50
+    # Step through one full 800-pixel line to verify HSync pulse appears
+    dut._log.info("Stepping through one horizontal line (800 pixels)")
+    hsync_low_detected = False
 
-    # Keep testing the module by changing the input values, waiting for
-    # one or more clock cycles, and asserting the expected output values.
+    for _ in range(800):
+        await ClockCycles(dut.clk, 1)
+        val = int(dut.uo_out.value)
+        if ((val >> 7) & 1) == 0:
+            hsync_low_detected = True
+
+    assert hsync_low_detected, "HSync never pulsed low across 800 pixel clocks"
+
+    dut._log.info("VGA timing test completed successfully")
